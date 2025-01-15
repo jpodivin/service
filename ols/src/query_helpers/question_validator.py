@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate
 
 from ols import config
 from ols.app.metrics import TokenMetricUpdater
-from ols.constants import SUBJECT_REJECTED, GenericLLMParameters
+from ols.constants import SUBJECT_ALLOWED, SUBJECT_REJECTED, GenericLLMParameters
 from ols.customize import prompts
 from ols.src.query_helpers.query_helper import QueryHelper
 from ols.utils.token_handler import TokenHandler
@@ -27,7 +27,8 @@ class QuestionValidator(QueryHelper):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Initialize the QuestionValidator."""
         generic_llm_params = {
-            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.max_tokens_for_response
+            GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.max_tokens_for_response,
+            GenericLLMParameters.CONSTRAINED: True,
         }
         super().__init__(*args, **dict(kwargs, generic_llm_params=generic_llm_params))
 
@@ -58,6 +59,8 @@ class QuestionValidator(QueryHelper):
         )
 
         bare_llm = self.llm_loader(self.provider, self.model, self.generic_llm_params)
+
+        bare_llm.regex = f"{SUBJECT_ALLOWED}|{SUBJECT_REJECTED}"
 
         # Tokens-check: We trigger the computation of the token count
         # without care about the return value. This is to ensure that

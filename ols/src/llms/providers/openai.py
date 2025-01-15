@@ -4,6 +4,7 @@ import logging
 from typing import Any, Optional
 
 from langchain.llms.base import LLM
+from langchain_community.chat_models.outlines import ChatOutlines
 from langchain_openai import ChatOpenAI
 
 from ols import constants
@@ -49,4 +50,6 @@ class OpenAI(LLMProvider):
 
     def load(self) -> LLM:
         """Load LLM."""
+        if self.params.get("constrained"):
+            return ChatOutlines(**self.params)
         return ChatOpenAI(**self.params)

@@ -69,6 +69,7 @@ class GenericLLMParameters:
     TOP_K = "top_k"
     TOP_P = "top_p"
     TEMPERATURE = "temperature"
+    CONSTRAINED = "constrained"
 
 
 # Token related constants

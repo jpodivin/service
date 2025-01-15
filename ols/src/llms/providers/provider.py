@@ -102,6 +102,7 @@ RHELAIVLLMParameters = {
     ProviderParameter("max_tokens", int),
     ProviderParameter("verbose", bool),
     ProviderParameter("http_client", httpx.Client),
+    ProviderParameter("constrained", bool),
 }
 
 BAMParameters = {

@@ -67,7 +67,14 @@ def test_validate_question_llm_loader():
     # be performed
     llm_loader = mock_llm_loader(
         None,
-        expected_params=("p1", "m1", {GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4}),
+        expected_params=(
+            "p1",
+            "m1",
+            {
+                GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: 4,
+                GenericLLMParameters.CONSTRAINED: True,
+            },
+        ),
     )
 
     # check that LLM loader was called with expected parameters
