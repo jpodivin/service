@@ -1,7 +1,7 @@
 """Class responsible for validating questions and providing one-word responses."""
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
@@ -23,9 +23,9 @@ class QuestionValidator(QueryHelper):
     # as we only need to check if the question is valid or not - we have
     # a fixed responses for that
     max_tokens_for_response = 4
-
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, validator_prompt: Optional[str] = None, *args: Any, **kwargs: Any) -> None:
         """Initialize the QuestionValidator."""
+        self.prompt = validator_prompt or prompts.QUESTION_VALIDATOR_PROMPT_TEMPLATE
         generic_llm_params = {
             GenericLLMParameters.MAX_TOKENS_FOR_RESPONSE: self.max_tokens_for_response
         }
