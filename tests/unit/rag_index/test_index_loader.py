@@ -20,8 +20,7 @@ def test_index_loader_empty_config(caplog):
     assert index is None
 
 
-@patch("llama_index.core.StorageContext.from_defaults")
-def test_index_loader_no_id(storage_context):
+def test_index_loader_no_id():
     """Test index loader without index id."""
     config.ols_config.reference_content = ReferenceContent(None)
     config.ols_config.reference_content.product_docs_index_path = Path("./some_dir")
@@ -35,54 +34,58 @@ def test_index_loader_no_id(storage_context):
     assert index is None
 
 
-@patch("llama_index.core.StorageContext.from_defaults")
-@patch("llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir")
-@patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex)
-def test_index_loader(storage_context, from_persist_dir):
+def test_index_loader():
     """Test index loader."""
     config.ols_config.reference_content = ReferenceContent(None)
     config.ols_config.reference_content.product_docs_index_path = Path("./some_dir")
     config.ols_config.reference_content.product_docs_index_id = "./some_id"
 
-    from_persist_dir.return_value = None
-
-    index_loader_obj = IndexLoader(config.ols_config.reference_content)
+    with patch("llama_index.core.StorageContext.from_defaults") as from_defaults:
+        with patch(
+            "llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir"
+        ) as from_persist_dir:
+            with patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex):
+                index_loader_obj = IndexLoader(config.ols_config.reference_content)
     index = index_loader_obj.vector_index
 
+    from_defaults.assert_called_once()
+    from_persist_dir.assert_called_once()
     assert isinstance(index, MockLlamaIndex)
 
 
-@patch("llama_index.core.StorageContext.from_defaults")
-@patch("llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir")
-@patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex)
-def test_index_loader_from_faiss(storage_context, from_persist_dir):
+def test_index_loader_from_faiss():
     """Test index loader when 'faiss' is selected for the vector store type."""
     config.ols_config.reference_content = ReferenceContent(None)
     config.ols_config.reference_content.vector_store_type = VectorStoreType.FAISS
     config.ols_config.reference_content.product_docs_index_path = Path("./some_dir")
     config.ols_config.reference_content.product_docs_index_id = "./some_id"
 
-    from_persist_dir.return_value = None
-
-    index_loader_obj = IndexLoader(config.ols_config.reference_content)
+    with patch("llama_index.core.StorageContext.from_defaults") as from_defaults:
+        with patch(
+            "llama_index.vector_stores.faiss.FaissVectorStore.from_persist_dir"
+        ) as from_persist_dir:
+            with patch("llama_index.core.load_index_from_storage", new=MockLlamaIndex):
+                index_loader_obj = IndexLoader(config.ols_config.reference_content)
     index = index_loader_obj.vector_index
 
+    from_defaults.assert_called_once()
+    from_persist_dir.assert_called_once()
     assert isinstance(index, MockLlamaIndex)
 
 
-@patch("llama_index.core.StorageContext.from_defaults")
-@patch("llama_index.vector_stores.postgres.PGVectorStore.from_params")
-@patch("llama_index.core.VectorStoreIndex.from_vector_store", new=MockLlamaIndex)
-def test_index_loader_from_postgres(storage_context, from_params):
+def test_index_loader_from_postgres():
     """Test index loader when 'postgres' is selected for the vector store type."""
     config.ols_config.reference_content = ReferenceContent(None)
     config.ols_config.reference_content.vector_store_type = VectorStoreType.POSTGRES
     config.ols_config.reference_content.product_docs_index_id = "some_id"
     config.ols_config.reference_content.postgres = PostgresConfig()
 
-    from_params.return_value = None
-
-    index_loader_obj = IndexLoader(config.ols_config.reference_content)
+    with patch("llama_index.core.StorageContext.from_defaults") as from_defaults:
+        with patch(
+            "llama_index.core.VectorStoreIndex.from_vector_store", new=MockLlamaIndex
+        ):
+            index_loader_obj = IndexLoader(config.ols_config.reference_content)
     index = index_loader_obj.vector_index
 
+    from_defaults.assert_called()
     assert isinstance(index, MockLlamaIndex)
